@@ -36,14 +36,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (credentials: LoginRequest) => {
-    const response = await usuarioService.autenticar(credentials);
-    
-    // Armazenar token e dados do usuário
-    localStorage.setItem('midas_token', response.Token);
-    localStorage.setItem('midas_user', JSON.stringify(response));
-    
-    setUser(response as Usuario);
-  };
+  const response = await usuarioService.autenticar(credentials);
+
+  console.log("RESPOSTA LOGIN:", response);
+
+  localStorage.setItem('midas_token', response.token);
+  localStorage.setItem('midas_user', JSON.stringify(response));
+
+  setUser(response as Usuario);
+};
+
 
   const logout = () => {
     localStorage.removeItem('midas_token');

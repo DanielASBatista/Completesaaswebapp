@@ -3,7 +3,7 @@
 /**
  * Valida se o email tem formato válido
  */
-export function isValidEmail(email: string): boolean {
+  export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
@@ -106,7 +106,7 @@ export function isValidPhone(phone: string): boolean {
  * Valida se a senha tem comprimento mínimo
  */
 export function isValidPassword(password: string, minLength: number = 6): boolean {
-  return password.length >= minLength;
+return password.length >= minLength;
 }
 
 /**

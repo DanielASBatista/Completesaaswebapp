@@ -77,7 +77,7 @@ export interface Responsavel {
 
 // DTOs para requisições
 export interface LoginRequest {
-  emailUsuario: string;
+  nomeUsuario: string;
   PasswordString: string;
 }
 
@@ -88,7 +88,7 @@ export interface LoginResponse {
   emailUsuario: string;
   telefone: string;
   IdEmpresa: number;
-  Token: string;
+  token: string;
 }
 
 export interface RegistrarRequest {

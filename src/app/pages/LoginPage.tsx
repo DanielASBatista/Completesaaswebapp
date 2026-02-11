@@ -24,7 +24,7 @@ export function LoginPage() {
 
     try {
       await login({
-        emailUsuario: email,
+        nomeUsuario: email,
         PasswordString: password,
       });
       toast.success('Login realizado com sucesso!');
@@ -49,13 +49,13 @@ export function LoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="email">Usuário</Label>
               <Input
-                id="email"
-                type="email"
+                id="usuario"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
+                placeholder="Digite seu login de usuário."
                 required
                 className="mt-1"
               />
