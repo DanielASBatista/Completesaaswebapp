@@ -64,14 +64,14 @@ export function LancamentosPage() {
 
     if (filterYear) {
       filtered = filtered.filter(lanc => {
-        const year = new Date(lanc.Data).getFullYear();
+        const year = new Date(lanc.data).getFullYear();
         return year === parseInt(filterYear);
       });
     }
 
     if (filterMonth) {
       filtered = filtered.filter(lanc => {
-        const month = new Date(lanc.Data).getMonth() + 1;
+        const month = new Date(lanc.data).getMonth() + 1;
         return month === parseInt(filterMonth);
       });
     }
@@ -85,7 +85,7 @@ export function LancamentosPage() {
     try {
       await lancamentoService.delete(deleteId);
       toast.success('Lançamento excluído com sucesso!');
-      setLancamentos(prev => prev.filter(l => l.IdLancamento !== deleteId));
+      setLancamentos(prev => prev.filter(l => l.idLancamento !== deleteId));
       setDeleteId(null);
     } catch (error: any) {
       toast.error('Erro ao excluir lançamento');
@@ -102,6 +102,12 @@ export function LancamentosPage() {
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('pt-BR');
+  };
+
+  const getTipoLabel = (tipo: number | string) => {
+    if (tipo === 0 || tipo === 'Receita') return 'Receita';
+    if (tipo === 1 || tipo === 'Despesa') return 'Despesa';
+    return tipo;
   };
 
   if (isLoading) {
@@ -191,33 +197,38 @@ export function LancamentosPage() {
                 </TableRow>
               ) : (
                 filteredLancamentos.map((lanc) => (
-                  <TableRow key={lanc.IdLancamento}>
-                    <TableCell>{formatDate(lanc.Data)}</TableCell>
-                    <TableCell className="font-medium">{lanc.DescricaoLancamento}</TableCell>
+                  <TableRow key={lanc.idLancamento}>
+                    <TableCell>{formatDate(lanc.data)}</TableCell>
+                    <TableCell className="font-medium">{lanc.descricaoLancamento}</TableCell>
                     <TableCell>
                       <Badge
                         className={
-                          lanc.TipoLancamento === 'RECEITA'
+                          getTipoLabel(lanc.tipoLancamento) === 'Receita'
                             ? 'bg-green-100 text-green-800 hover:bg-green-100'
                             : 'bg-red-100 text-red-800 hover:bg-red-100'
                         }
                       >
-                        {lanc.TipoLancamento}
+                        {getTipoLabel(lanc.tipoLancamento)}
                       </Badge>
                     </TableCell>
-                    <TableCell className={`font-bold ${
-                      lanc.TipoLancamento === 'RECEITA' ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {formatCurrency(lanc.Valor)}
+
+                    <TableCell
+                      className={`font-bold ${
+                        getTipoLabel(lanc.tipoLancamento) === 'Receita'
+                          ? 'text-green-600'
+                          : 'text-red-600'
+                      }`}
+                    >
+                      {formatCurrency(lanc.valor)}
                     </TableCell>
                     <TableCell className="text-gray-600 max-w-xs truncate">
-                      {lanc.ObservacaoLancamento || '-'}
+                      {lanc.observacaoLancamento || '-'}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setDeleteId(lanc.IdLancamento)}
+                        onClick={() => setDeleteId(lanc.idLancamento)}
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>

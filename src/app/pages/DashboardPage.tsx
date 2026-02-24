@@ -46,25 +46,36 @@ export function DashboardPage() {
     }).format(value);
   };
 
-  // Agrupar lançamentos por dia para o gráfico
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return '-';
+    return new Date(dateStr).toLocaleDateString('pt-BR');
+  };
+
+  // 📊 Agrupar lançamentos por dia
   const chartData = lancamentos.reduce((acc, lanc) => {
-    const data = new Date(lanc.Data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-    const existing = acc.find(item => item.data === data);
-    
+    if (!lanc.data) return acc;
+
+    const dataFormatada = new Date(lanc.data).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+    });
+
+    const existing = acc.find(item => item.data === dataFormatada);
+
     if (existing) {
-      if (lanc.TipoLancamento === 'RECEITA') {
-        existing.receitas += lanc.Valor;
-      } else {
-        existing.despesas += lanc.Valor;
+      if (lanc.tipoLancamento === 0) {
+        existing.receitas += lanc.valor;
+      } else if (lanc.tipoLancamento === 1) {
+        existing.despesas += lanc.valor;
       }
     } else {
       acc.push({
-        data,
-        receitas: lanc.TipoLancamento === 'RECEITA' ? lanc.Valor : 0,
-        despesas: lanc.TipoLancamento === 'DESPESA' ? lanc.Valor : 0,
+        data: dataFormatada,
+        receitas: lanc.tipoLancamento === 0 ? lanc.valor : 0,
+        despesas: lanc.tipoLancamento === 1 ? lanc.valor : 0,
       });
     }
-    
+
     return acc;
   }, [] as { data: string; receitas: number; despesas: number }[]);
 
@@ -79,14 +90,15 @@ export function DashboardPage() {
   return (
     <Layout>
       <div className="space-y-6">
+
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600 mt-1">Visão geral das suas finanças</p>
         </div>
 
-        {/* Cards de Resumo */}
+        {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Total Receitas */}
+
           <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
             <div className="flex items-start justify-between">
               <div>
@@ -99,13 +111,8 @@ export function DashboardPage() {
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-4 text-sm text-green-700">
-              <ArrowUpRight className="w-4 h-4" />
-              <span>Entradas</span>
-            </div>
           </Card>
 
-          {/* Total Despesas */}
           <Card className="p-6 bg-gradient-to-br from-red-50 to-red-100 border-red-200">
             <div className="flex items-start justify-between">
               <div>
@@ -118,13 +125,8 @@ export function DashboardPage() {
                 <TrendingDown className="w-6 h-6 text-white" />
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-4 text-sm text-red-700">
-              <ArrowDownRight className="w-4 h-4" />
-              <span>Saídas</span>
-            </div>
           </Card>
 
-          {/* Saldo */}
           <Card className="p-6 bg-gradient-to-br from-[#4B0012]/10 to-[#4B0012]/20 border-[#4B0012]/30">
             <div className="flex items-start justify-between">
               <div>
@@ -137,24 +139,22 @@ export function DashboardPage() {
                 <Wallet className="w-6 h-6 text-white" />
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-4 text-sm text-[#4B0012]">
-              <span>Receitas - Despesas</span>
-            </div>
           </Card>
+
         </div>
 
         {/* Gráfico */}
         <Card className="p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Receitas x Despesas (Mês Atual)</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-6">
+            Receitas x Despesas (Mês Atual)
+          </h2>
+
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="data" />
               <YAxis />
-              <Tooltip 
-                formatter={(value) => formatCurrency(Number(value))}
-                contentStyle={{ borderRadius: '8px' }}
-              />
+              <Tooltip formatter={(value) => formatCurrency(Number(value))} />
               <Legend />
               <Bar dataKey="receitas" fill="#10B981" name="Receitas" radius={[8, 8, 0, 0]} />
               <Bar dataKey="despesas" fill="#EF4444" name="Despesas" radius={[8, 8, 0, 0]} />
@@ -164,33 +164,48 @@ export function DashboardPage() {
 
         {/* Últimos Lançamentos */}
         <Card className="p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Últimos Lançamentos</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Últimos Lançamentos
+          </h2>
+
           <div className="space-y-3">
-            {lancamentos.slice(0, 5).map((lanc) => (
-              <div 
-                key={lanc.IdLancamento} 
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${
-                    lanc.TipoLancamento === 'RECEITA' ? 'bg-green-500' : 'bg-red-500'
-                  }`} />
-                  <div>
-                    <p className="font-medium text-gray-900">{lanc.DescricaoLancamento}</p>
-                    <p className="text-sm text-gray-600">
-                      {new Date(lanc.Data).toLocaleDateString('pt-BR')}
-                    </p>
+            {lancamentos.slice(0, 5).map((lanc) => {
+              const isReceita = lanc.tipoLancamento === 0;
+
+              return (
+                <div
+                  key={lanc.idLancamento}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        isReceita ? 'bg-green-500' : 'bg-red-500'
+                      }`}
+                    />
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {lanc.descricaoLancamento}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {formatDate(lanc.data)}
+                      </p>
+                    </div>
                   </div>
+
+                  <p
+                    className={`font-bold ${
+                      isReceita ? 'text-green-600' : 'text-red-600'
+                    }`}
+                  >
+                    {isReceita ? '+' : '-'} {formatCurrency(lanc.valor)}
+                  </p>
                 </div>
-                <p className={`font-bold ${
-                  lanc.TipoLancamento === 'RECEITA' ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {lanc.TipoLancamento === 'RECEITA' ? '+' : '-'} {formatCurrency(lanc.Valor)}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
+
       </div>
     </Layout>
   );

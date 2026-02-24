@@ -43,13 +43,11 @@ export function NovoLancamentoPage() {
 
     try {
       await lancamentoService.create({
-        IdUsuario: user.IdUsuario,
-        TipoLancamento: formData.TipoLancamento,
-        DescricaoLancamento: formData.DescricaoLancamento,
-        ObservacaoLancamento: formData.ObservacaoLancamento,
-        Valor: parseFloat(formData.Valor),
-        Data: new Date(formData.Data).toISOString(),
-        DataCriacao: new Date().toISOString(),
+        tipoLancamento: Number(formData.TipoLancamento),
+        descricaoLancamento: formData.DescricaoLancamento,
+        observacaoLancamento: formData.ObservacaoLancamento,
+        valor: parseFloat(formData.Valor),
+        data: new Date(formData.Data).toISOString(),
       });
 
       toast.success('Lançamento criado com sucesso!');
@@ -98,8 +96,8 @@ export function NovoLancamentoPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="RECEITA">Receita</SelectItem>
-                  <SelectItem value="DESPESA">Despesa</SelectItem>
+                  <SelectItem value="0">Receita</SelectItem>
+                  <SelectItem value="1">Despesa</SelectItem>
                 </SelectContent>
               </Select>
             </div>

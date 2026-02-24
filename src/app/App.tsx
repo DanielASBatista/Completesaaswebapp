@@ -23,8 +23,8 @@ export default function App() {
           <Route path="/emprestimos" element={<EmprestimosPage />} />
           <Route path="/recorrencias" element={<RecorrenciasPage />} />
           <Route path="/empresa" element={<EmpresaPage />} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" />

@@ -22,21 +22,21 @@ export interface Empresa {
 }
 
 export interface Lancamento {
-  IdLancamento: number;
-  IdUsuario: number;
-  IdProjecao?: number | null;
-  IdSimEmprestimo?: number | null;
+  idLancamento: number;
+  idUsuario: number;
+  idProjecao?: number | null;
+  idSimEmprestimo?: number | null;
   idRecorrente?: number | null;
-  TipoLancamento: string; // "RECEITA" ou "DESPESA"
-  DescricaoLancamento: string;
-  ObservacaoLancamento: string;
-  Valor: number;
-  Data: string; // ISO date string
-  DataCriacao: string; // ISO date string
+  tipoLancamento: number; // 0 para receita, 1 para despesa
+  descricaoLancamento: string;
+  observacaoLancamento: string;
+  valor: number;
+  data: string; // ISO date string
+  dataCriacao: string; // ISO date string
 }
 
 export interface Emprestimo {
-  IdSimEmprestimo: number;
+  idSimEmprestimo: number;
   nomeEmprestimo: string;
   descricaoEmprestimo: string;
   provedorEmprestimo: string;
