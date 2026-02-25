@@ -127,13 +127,13 @@ curl -X POST https://localhost:5001/Lancamentos/New \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer SEU_TOKEN_AQUI" \
   -d '{
-    "IdUsuario": 1,
-    "TipoLancamento": "RECEITA",
-    "DescricaoLancamento": "Venda de produto",
-    "ObservacaoLancamento": "Cliente XYZ",
-    "Valor": 1500.00,
-    "Data": "2026-02-11T10:00:00Z",
-    "DataCriacao": "2026-02-11T10:00:00Z"
+    "idUsuario": 1,
+    "tipoLancamento": "RECEITA",
+    "descricaoLancamento": "Venda de produto",
+    "observacaoLancamento": "Cliente XYZ",
+    "valor": 1500.00,
+    "data": "2026-02-11T10:00:00Z",
+    "dataCriacao": "2026-02-11T10:00:00Z"
   }'
 ```
 
