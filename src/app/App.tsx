@@ -6,7 +6,9 @@ import { DashboardPage } from './pages/DashboardPage';
 import { LancamentosPage } from './pages/LancamentosPage';
 import { NovoLancamentoPage } from './pages/NovoLancamentoPage';
 import { ProjecoesPage } from './pages/ProjecoesPage';
+import { NovaProjecaoPage } from './pages/NovaProjecaoPage';
 import { EmprestimosPage } from './pages/EmprestimosPage';
+import { NovoEmprestimoPage } from './pages/NovoEmprestimoPage';
 import { RecorrenciasPage } from './pages/RecorrenciasPage';
 import { EmpresaPage } from './pages/EmpresaPage';
 import { RegisterPage } from './pages/RegistrarPage';
@@ -22,7 +24,9 @@ export default function App() {
           <Route path="/lancamentos" element={<LancamentosPage />} />
           <Route path="/lancamentos/novo" element={<NovoLancamentoPage />} />
           <Route path="/projecoes" element={<ProjecoesPage />} />
+          <Route path="/projecoes/nova" element={<NovaProjecaoPage />} />
           <Route path="/emprestimos" element={<EmprestimosPage />} />
+          <Route path="/emprestimos/novo" element={<NovoEmprestimoPage />} />
           <Route path="/recorrencias" element={<RecorrenciasPage />} />
           <Route path="/empresa" element={<EmpresaPage />} />
           <Route path="/" element={<Navigate to="/login" replace />} />

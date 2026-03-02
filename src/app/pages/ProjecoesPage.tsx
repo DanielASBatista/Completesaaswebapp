@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router';
 import { Layout } from '../components/Layout';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { Button } from '../components/ui/button';
@@ -14,7 +15,7 @@ import {
   TableRow,
 } from '../components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
-import { Plus, Trash2, Filter } from 'lucide-react';
+import { Plus, Trash2, Filter} from 'lucide-react';
 import { projecaoService } from '../../services/projecaoService';
 import type { Projecao } from '../../types';
 import { toast } from 'sonner';
@@ -97,10 +98,12 @@ export function ProjecoesPage() {
             <h1 className="text-3xl font-bold text-gray-900">Projeções</h1>
             <p className="text-gray-600 mt-1">Planeje suas receitas e despesas futuras</p>
           </div>
-          <Button className="bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium">
-            <Plus className="w-4 h-4 mr-2" />
-            Nova Projeção
-          </Button>
+          <Link to="/projecoes/nova">
+            <Button className="bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium">
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Projeção
+            </Button>
+          </Link>
         </div>
 
         {/* Filtros */}

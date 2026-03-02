@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router'
 import { Layout } from '../components/Layout';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { Button } from '../components/ui/button';
@@ -81,10 +82,12 @@ export function EmprestimosPage() {
             <h1 className="text-3xl font-bold text-gray-900">Empréstimos</h1>
             <p className="text-gray-600 mt-1">Gerencie seus empréstimos e financiamentos</p>
           </div>
-          <Button className="bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium">
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Empréstimo
-          </Button>
+          <Link to="/emprestimos/novo">
+            <Button className="bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium">
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Empréstimo
+            </Button>
+          </Link>
         </div>
 
         {/* Tabela */}
