@@ -43,26 +43,26 @@ export interface Emprestimo {
   valorEmprestimo: number;
   parcelasEmprestimo: number;
   valorParcelas: number;
-  IOFemprestimo: number;
+  ioFemprestimo: number;
   despesasEmprestimo: number;
   tarifasEmprestimo: number;
-  Data: string; // ISO date string
+  data: string; // ISO date string
 }
 
 export interface Projecao {
-  IdProjecao: number;
-  Titulo: string;
+  idProjecao: number;
+  titulo: string;
   dsProjecao: string;
-  ValorPrevisto: number;
-  DataReferencia: string; // ISO date string
-  DataCriacao: string; // ISO date string
+  valorPrevisto: number;
+  dataReferencia: string; // ISO date string
+  dataCriacao: string; // ISO date string
 }
 
 export interface Recorrencia {
   idRecorrente: number;
-  IdProjecao: number;
+  idProjecao: number;
   dsRecorrente: string;
-  Valor: number;
+  valor: number;
   dataInicio: string; // ISO date string
   qtdeRecorrente: number;
 }
@@ -81,23 +81,19 @@ export interface LoginRequest {
   PasswordString: string;
 }
 
-export interface LoginResponse {
-  IdUsuario: number;
+export interface UsuarioAuth {
+  id: number;
   nomeUsuario: string;
-  sobrenome: string;
-  emailUsuario: string;
-  telefone: string;
-  IdEmpresa: number;
+}
+
+export interface LoginResponse {
   token: string;
+  usuario: UsuarioAuth;
 }
 
 export interface RegistrarRequest {
   nomeUsuario: string;
-  sobrenome: string;
-  emailUsuario: string;
-  telefone: string;
   PasswordString: string;
-  IdEmpresa: number;
 }
 
 export interface AlterarSenhaRequest {

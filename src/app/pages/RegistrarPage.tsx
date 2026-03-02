@@ -1,36 +1,52 @@
-import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router';
-import { useAuth } from '../../context/AuthContext';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { usuarioService } from '../../services/usuarioService';
 
-export function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { login, isAuthenticated } = useAuth();
+export function RegisterPage() {
   const navigate = useNavigate();
 
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  const [nomeUsuario, setNomeUsuario] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+
+    if (success) {
+      timer = setTimeout(() => {
+        navigate('/');
+      }, 3000);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [success, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await login({
-        nomeUsuario: email,
-        PasswordString: password,
+      await usuarioService.registrar({
+        nomeUsuario,
+        PasswordString: password
       });
-      toast.success('Login realizado com sucesso!');
-      navigate('/dashboard');
+
+      toast.success(
+        'Cadastro realizado com sucesso! Redirecionando para login...'
+      );
+
+      setSuccess(true);
+
     } catch (error: any) {
-      toast.error(error.message || 'Erro ao fazer login. Verifique suas credenciais.');
+      toast.error(error.message || 'Erro ao registrar usuário.');
     } finally {
       setIsLoading(false);
     }
@@ -40,69 +56,61 @@ export function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#4B0012] to-[#2d0009] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-xl p-8">
-          {/* Logo/Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-[#4B0012]">Projeto Midas</h1>
-            <p className="text-gray-600 mt-2">Sistema de Gestão Financeira</p>
+            <h1 className="text-3xl font-bold text-[#4B0012]">
+              Criar Conta
+            </h1>
+            <p className="text-gray-600 mt-2">
+              Cadastro de usuário
+            </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+
             <div>
-              <Label htmlFor="email">Usuário</Label>
+              <Label>Usuário</Label>
               <Input
-                id="usuario"
-                type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Digite seu login de usuário."
+                value={nomeUsuario}
+                onChange={(e) => setNomeUsuario(e.target.value)}
                 required
-                className="mt-1"
               />
             </div>
 
             <div>
-              <Label htmlFor="password">Senha</Label>
+              <Label>Senha</Label>
               <Input
-                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
                 required
-                className="mt-1"
               />
             </div>
 
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || success}
               className="w-full bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium"
             >
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Entrando...
+                  Cadastrando...
                 </>
               ) : (
-                'Entrar'
+                'Cadastrar'
               )}
             </Button>
-            <div className="text-center mt-4">
+
             <Button
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/')}
             >
-              Criar conta
+              Voltar para login
             </Button>
-          </div>
-          </form>
 
-          <p className="text-center text-sm text-gray-600 mt-6">
-            Projeto Midas © 2026
-          </p>
+          </form>
         </div>
       </div>
     </div>

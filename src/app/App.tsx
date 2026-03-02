@@ -9,6 +9,7 @@ import { ProjecoesPage } from './pages/ProjecoesPage';
 import { EmprestimosPage } from './pages/EmprestimosPage';
 import { RecorrenciasPage } from './pages/RecorrenciasPage';
 import { EmpresaPage } from './pages/EmpresaPage';
+import { RegisterPage } from './pages/RegistrarPage';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/lancamentos" element={<LancamentosPage />} />
           <Route path="/lancamentos/novo" element={<NovoLancamentoPage />} />

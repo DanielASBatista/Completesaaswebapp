@@ -41,6 +41,7 @@ export const STATUS = {
 // Rotas da aplicação
 export const ROUTES = {
   LOGIN: '/login',
+  REGISTER: '/register',
   DASHBOARD: '/dashboard',
   LANCAMENTOS: '/lancamentos',
   LANCAMENTOS_NOVO: '/lancamentos/novo',

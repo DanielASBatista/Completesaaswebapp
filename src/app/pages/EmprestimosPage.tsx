@@ -15,10 +15,13 @@ import { Plus, Trash2 } from 'lucide-react';
 import { emprestimoService } from '../../services/emprestimoService';
 import type { Emprestimo } from '../../types';
 import { toast } from 'sonner';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
+   AlertDialogTitle } from '../components/ui/alert-dialog';
 
 export function EmprestimosPage() {
   const [emprestimos, setEmprestimos] = useState<Emprestimo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
     loadEmprestimos();
@@ -42,6 +45,19 @@ export function EmprestimosPage() {
       style: 'currency',
       currency: 'BRL',
     }).format(value);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await emprestimoService.delete(deleteId);
+      toast.success('Empréstimo excluído com sucesso!');
+      setEmprestimos((prev) => prev.filter((emp) => emp.idSimEmprestimo !== deleteId));
+      setDeleteId(null);
+    } catch (error: any) {
+      toast.error('Erro ao excluir empréstimo');
+      console.error(error);
+    }
   };
 
   const formatDate = (dateStr: string) => {
@@ -78,11 +94,11 @@ export function EmprestimosPage() {
               <TableRow>
                 <TableHead>Nome</TableHead>
                 <TableHead>Provedor</TableHead>
-                <TableHead>Valor Total</TableHead>
+                <TableHead>Valor do Empréstimo</TableHead>
+                <TableHead>Valor Final</TableHead>
                 <TableHead>Parcelas</TableHead>
                 <TableHead>Valor Parcela</TableHead>
                 <TableHead>IOF</TableHead>
-                <TableHead>Data</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -95,18 +111,35 @@ export function EmprestimosPage() {
                 </TableRow>
               ) : (
                 emprestimos.map((emp) => (
-                  <TableRow key={emp.IdSimEmprestimo}>
+                  <TableRow key={emp.idSimEmprestimo}>
                     <TableCell className="font-medium">{emp.nomeEmprestimo}</TableCell>
                     <TableCell>{emp.provedorEmprestimo}</TableCell>
-                    <TableCell className="font-bold text-[#4B0012]">
-                      {formatCurrency(emp.valorEmprestimo)}
+
+                    {/* Valor do Empréstimo */}
+                    <TableCell>{formatCurrency(emp.valorEmprestimo)}</TableCell>
+
+                    {/* Valor Final */}
+                    <TableCell>
+                      {formatCurrency(
+                        (emp.valorEmprestimo ?? 0) +
+                          (emp.ioFemprestimo ?? 0) +
+                          (emp.despesasEmprestimo ?? 0) +
+                          (emp.tarifasEmprestimo ?? 0)
+                      )}
                     </TableCell>
+
                     <TableCell>{emp.parcelasEmprestimo}x</TableCell>
                     <TableCell>{formatCurrency(emp.valorParcelas)}</TableCell>
-                    <TableCell>{formatCurrency(emp.IOFemprestimo)}</TableCell>
-                    <TableCell>{formatDate(emp.Data)}</TableCell>
+
+                    {/* IOF em percentual */}
+                    <TableCell>
+                      {emp.ioFemprestimo != null && !isNaN(Number(emp.ioFemprestimo))
+                        ? (Number(emp.ioFemprestimo) * 100).toFixed(3) + '%'
+                        : '-'}
+                    </TableCell>
+
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => setDeleteId(emp.idSimEmprestimo)}>
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>
                     </TableCell>
@@ -116,7 +149,25 @@ export function EmprestimosPage() {
             </TableBody>
           </Table>
         </Card>
+
+          {/* Delete Dialog */}
+          <AlertDialog open={deleteId !== null} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Tem certeza que deseja excluir este empréstimo? Esta ação não pode ser desfeita.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete} className="bg-red-600 text-white hover:bg-red-700">
+                  Excluir
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
       </div>
     </Layout>
   );
-}
+}   
