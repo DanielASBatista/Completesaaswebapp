@@ -65,6 +65,8 @@ export interface Recorrencia {
   valor: number;
   dataInicio: string; // ISO date string
   qtdeRecorrente: number;
+  tipoRecorrencia: number;
+  obRecorrente: string
 }
 
 export interface Responsavel {
@@ -106,4 +108,11 @@ export interface SomatoriaResponse {
   totalReceitas: number;
   totalDespesas: number;
   saldo: number;
+}
+
+export interface TipoRecorrencia {
+  id: number;
+  nome: string;
+  padraoSistema: boolean;
+  descricao: string;
 }

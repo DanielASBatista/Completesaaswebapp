@@ -1,5 +1,5 @@
 // Configuração base da API
-const API_BASE_URL = 'http://localhost:5059';
+const API_BASE_URL = 'https://danielhernanrpgapi.azurewebsites.net';
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
