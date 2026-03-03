@@ -15,6 +15,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { recorrenciaService } from '../../services/recorrenciaService';
 import type { Recorrencia } from '../../types';
 import { toast } from 'sonner';
+import { Link } from 'react-router';
 
 export function RecorrenciasPage() {
   const [recorrencias, setRecorrencias] = useState<Recorrencia[]>([]);
@@ -65,10 +66,12 @@ export function RecorrenciasPage() {
             <h1 className="text-3xl font-bold text-gray-900">Recorrências</h1>
             <p className="text-gray-600 mt-1">Lançamentos automáticos periódicos</p>
           </div>
-          <Button className="bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium">
-            <Plus className="w-4 h-4 mr-2" />
-            Nova Recorrência
-          </Button>
+            <Link to="/recorrencias/novo">
+              <Button className="bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium">
+                <Plus className="w-4 h-4 mr-2" />
+                Nova Recorrência
+              </Button>
+            </Link>
         </div>
 
         {/* Tabela */}
@@ -96,11 +99,11 @@ export function RecorrenciasPage() {
                   <TableRow key={rec.idRecorrente}>
                     <TableCell className="font-medium">{rec.dsRecorrente}</TableCell>
                     <TableCell className="font-bold text-[#4B0012]">
-                      {formatCurrency(rec.Valor)}
+                      {formatCurrency(rec.valor)}
                     </TableCell>
                     <TableCell>{formatDate(rec.dataInicio)}</TableCell>
                     <TableCell>{rec.qtdeRecorrente}x</TableCell>
-                    <TableCell>{rec.IdProjecao}</TableCell>
+                    <TableCell>{rec.idProjecao}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm">
                         <Trash2 className="w-4 h-4 text-red-600" />

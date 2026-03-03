@@ -10,6 +10,7 @@ import { NovaProjecaoPage } from './pages/NovaProjecaoPage';
 import { EmprestimosPage } from './pages/EmprestimosPage';
 import { NovoEmprestimoPage } from './pages/NovoEmprestimoPage';
 import { RecorrenciasPage } from './pages/RecorrenciasPage';
+import { NovaRecorrenciaPage } from './pages/NovaRecorrenciaPage';
 import { EmpresaPage } from './pages/EmpresaPage';
 import { RegisterPage } from './pages/RegistrarPage';
 
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/emprestimos" element={<EmprestimosPage />} />
           <Route path="/emprestimos/novo" element={<NovoEmprestimoPage />} />
           <Route path="/recorrencias" element={<RecorrenciasPage />} />
+          <Route path="/recorrencias/novo" element={<NovaRecorrenciaPage />} />
           <Route path="/empresa" element={<EmpresaPage />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />

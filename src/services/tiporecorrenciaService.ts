@@ -13,7 +13,11 @@ export const tipoRecorrenciaService = {
     async create(tipoRecorrencia: Partial<TipoRecorrencia>): Promise<TipoRecorrencia> {
         return apiRequest<TipoRecorrencia>('/TipoRecorrencia/New', {
             method: 'POST',
-            body: JSON.stringify(tipoRecorrencia)
+            body: JSON.stringify({
+                nome: tipoRecorrencia.nome,
+                descricao: tipoRecorrencia.descricao,
+                padraoSistema: tipoRecorrencia.padraoSistema,
+            })
         });
     },
 

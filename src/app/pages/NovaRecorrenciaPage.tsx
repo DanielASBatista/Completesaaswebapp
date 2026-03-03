@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
-import { ArrowLeft, Save, Loader2, Plus } from 'lucide-react';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../../context/AuthContext';
 import { recorrenciaService } from '../../services/recorrenciaService';
@@ -25,49 +25,39 @@ export function NovaRecorrenciaPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [tiposRecorrencia, setTiposRecorrencia] = useState<
-    { id: number; descricao: string }[]
+    { id: number; nome: string }[]
   >([]);
-  const [novoTipo, setNovoTipo] = useState('');
-  const [adicionandoNovoTipo, setAdicionandoNovoTipo] = useState(false);
 
   const [formData, setFormData] = useState({
-    TipoLancamento: '0', // 0 = Receita, 1 = Despesa
-    dsRecorrente: '',
-    obRecorrente: '',
+    TipoLancamento: '0',
+    DsRecorrente: '',
+    ObRecorrente: '',
     Valor: '',
-    dataInicio: new Date().toISOString().split('T')[0],
-    qtdeRecorrente: '1',
-    TipoRecorrenciaId: 0,
+    DataInicio: new Date().toISOString().split('T')[0],
+    QtdeRecorrente: '1',
+    IdTipoRecorrencia: '',
   });
 
-  // Carrega tipos existentes
   useEffect(() => {
-    tipoRecorrenciaService.getAll().then((res) => setTiposRecorrencia(res));
+    tipoRecorrenciaService.getAll().then((res) => {
+      setTiposRecorrencia(res);
+    });
   }, []);
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAddNovoTipo = async () => {
-    if (!novoTipo.trim()) return;
-    try {
-      const criado = await tipoRecorrenciaService.create({ descricao: novoTipo });
-      setTiposRecorrencia((prev) => [...prev, criado]);
-      setFormData((prev) => ({ ...prev, TipoRecorrenciaId: criado.id }));
-      setNovoTipo('');
-      setAdicionandoNovoTipo(false);
-      toast.success('Novo tipo de recorrência adicionado!');
-    } catch (err) {
-      console.error(err);
-      toast.error('Erro ao adicionar novo tipo');
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!user) {
       toast.error('Usuário não autenticado');
+      return;
+    }
+
+    if (!formData.IdTipoRecorrencia) {
+      toast.error('Selecione um tipo de recorrência');
       return;
     }
 
@@ -75,19 +65,20 @@ export function NovaRecorrenciaPage() {
 
     try {
       await recorrenciaService.create({
-        tipoRecorrencia: Number(formData.TipoLancamento),
-        dsRecorrente: formData.dsRecorrente,
-        obRecorrente: formData.obRecorrente,
-        valor: parseFloat(formData.Valor),
-        dataInicio: new Date(formData.dataInicio).toISOString(),
-        qtdeRecorrente: parseInt(formData.qtdeRecorrente),
-      });
+      tipoLancamento: Number(formData.TipoLancamento),
+      dsRecorrente: formData.DsRecorrente,
+      obRecorrente: formData.ObRecorrente,
+      valor: parseFloat(formData.Valor),
+      dataInicio: new Date(formData.DataInicio).toISOString(),
+      qtdeRecorrente: Number(formData.QtdeRecorrente),
+      tipoRecorrenciaId: Number(formData.IdTipoRecorrencia)
+    });
 
       toast.success('Recorrência criada com sucesso!');
       navigate('/recorrencias');
-    } catch (err) {
-      console.error(err);
+    } catch (error: any) {
       toast.error('Erro ao criar recorrência');
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +87,6 @@ export function NovaRecorrenciaPage() {
   return (
     <Layout>
       <div className="max-w-2xl space-y-6">
-        {/* Header */}
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -107,19 +97,26 @@ export function NovaRecorrenciaPage() {
             Voltar
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Nova Recorrência</h1>
-            <p className="text-gray-600 mt-1">Configure uma nova recorrência financeira</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Nova Recorrência
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Registre uma nova recorrência financeira
+            </p>
           </div>
         </div>
 
-        {/* Form */}
         <Card className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
+
+            {/* Tipo Lançamento */}
             <div>
-              <Label htmlFor="tipoLancamento">Tipo de Lançamento *</Label>
+              <Label>Tipo de Lançamento *</Label>
               <Select
                 value={formData.TipoLancamento}
-                onValueChange={(val) => handleChange('TipoLancamento', val)}
+                onValueChange={(value) =>
+                  handleChange('TipoLancamento', value)
+                }
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
@@ -131,111 +128,99 @@ export function NovaRecorrenciaPage() {
               </Select>
             </div>
 
+            {/* Descrição */}
             <div>
-              <Label htmlFor="descricao">Descrição *</Label>
+              <Label>Descrição *</Label>
               <Input
-                id="descricao"
-                value={formData.dsRecorrente}
-                onChange={(e) => handleChange('dsRecorrente', e.target.value)}
-                placeholder="Ex: Salário, Aluguel..."
+                value={formData.DsRecorrente}
+                onChange={(e) =>
+                  handleChange('DsRecorrente', e.target.value)
+                }
+                placeholder="Ex: Mensalidade, Assinatura, Aluguel..."
                 required
                 className="mt-1"
               />
             </div>
 
-            <div>
-              <Label htmlFor="valor">Valor *</Label>
-              <Input
-                id="valor"
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.Valor}
-                onChange={(e) => handleChange('Valor', e.target.value)}
-                placeholder="0,00"
-                required
-                className="mt-1"
-              />
+            {/* Valor e Data */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Valor *</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.Valor}
+                  onChange={(e) =>
+                    handleChange('Valor', e.target.value)
+                  }
+                  required
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label>Data Início *</Label>
+                <Input
+                  type="date"
+                  value={formData.DataInicio}
+                  onChange={(e) =>
+                    handleChange('DataInicio', e.target.value)
+                  }
+                  required
+                  className="mt-1"
+                />
+              </div>
             </div>
 
+            {/* Quantidade */}
             <div>
-              <Label htmlFor="dataInicio">Data Início *</Label>
+              <Label>Quantidade de Ocorrências *</Label>
               <Input
-                id="dataInicio"
-                type="date"
-                value={formData.dataInicio}
-                onChange={(e) => handleChange('dataInicio', e.target.value)}
-                required
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="qtdeRecorrente">Quantidade de Ocorrências *</Label>
-              <Input
-                id="qtdeRecorrente"
                 type="number"
                 min="1"
-                value={formData.qtdeRecorrente}
-                onChange={(e) => handleChange('qtdeRecorrente', e.target.value)}
+                value={formData.QtdeRecorrente}
+                onChange={(e) =>
+                  handleChange('QtdeRecorrente', e.target.value)
+                }
                 required
                 className="mt-1"
               />
             </div>
 
+            {/* Tipo Recorrência */}
             <div>
-              <Label htmlFor="tipoRecorrencia">Tipo de Recorrência *</Label>
+              <Label>Tipo de Recorrência *</Label>
               <Select
-                value={formData.TipoRecorrenciaId.toString()}
-                onValueChange={(val) => {
-                  if (val === 'novo') setAdicionandoNovoTipo(true);
-                  else handleChange('TipoRecorrenciaId', val);
-                }}
+                value={formData.IdTipoRecorrencia}
+                onValueChange={(value) =>
+                  handleChange('IdTipoRecorrencia', value)
+                }
               >
                 <SelectTrigger className="mt-1">
-                  <SelectValue />
+                  <SelectValue placeholder="Selecione um tipo" />
                 </SelectTrigger>
                 <SelectContent>
                   {tiposRecorrencia.map((tipo) => (
-                    <SelectItem key={tipo.id} value={tipo.id.toString()}>
-                      {tipo.descricao}
+                    <SelectItem
+                      key={tipo.id}
+                      value={tipo.id.toString()}
+                    >
+                      {tipo.nome}
                     </SelectItem>
                   ))}
-                  <SelectItem value="novo">
-                    <Plus className="w-4 h-4 mr-1 inline" />
-                    Adicionar novo tipo
-                  </SelectItem>
                 </SelectContent>
               </Select>
-
-              {adicionandoNovoTipo && (
-                <div className="flex gap-2 mt-2">
-                  <Input
-                    placeholder="Novo tipo de recorrência"
-                    value={novoTipo}
-                    onChange={(e) => setNovoTipo(e.target.value)}
-                  />
-                  <Button type="button" onClick={handleAddNovoTipo}>
-                    Salvar
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setAdicionandoNovoTipo(false)}
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              )}
             </div>
 
+            {/* Observação */}
             <div>
-              <Label htmlFor="observacao">Observação</Label>
+              <Label>Observação</Label>
               <Textarea
-                id="observacao"
-                value={formData.obRecorrente}
-                onChange={(e) => handleChange('obRecorrente', e.target.value)}
-                placeholder="Informações adicionais sobre esta recorrência..."
+                value={formData.ObRecorrente}
+                onChange={(e) =>
+                  handleChange('ObRecorrente', e.target.value)
+                }
                 rows={4}
                 className="mt-1"
               />
@@ -259,6 +244,7 @@ export function NovaRecorrenciaPage() {
                   </>
                 )}
               </Button>
+
               <Button
                 type="button"
                 variant="outline"
