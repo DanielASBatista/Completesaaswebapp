@@ -1,17 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/card';
+import { Button } from '../components/ui/button';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { lancamentoService } from '../../services/lancamentoService';
-import type { SomatoriaResponse, Lancamento } from '../../types';
-import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import type { Lancamento } from '../../types';
+import {
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  AlertTriangle,
+  Plus,
+} from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router';
 
 export function DashboardPage() {
-  const [somatoria, setSomatoria] = useState<SomatoriaResponse | null>(null);
   const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadData();
@@ -24,60 +41,97 @@ export function DashboardPage() {
       const ano = now.getFullYear();
       const mes = now.getMonth() + 1;
 
-      const [somatoriaData, lancamentosData] = await Promise.all([
-        lancamentoService.getSomatoria(),
-        lancamentoService.getByMes(ano, mes),
-      ]);
-
-      setSomatoria(somatoriaData);
-      setLancamentos(lancamentosData);
-    } catch (error: any) {
-      toast.error('Erro ao carregar dados do dashboard');
+      const data = await lancamentoService.getByMes(ano, mes);
+      setLancamentos(data);
+    } catch (error) {
+      toast.error('Erro ao carregar dashboard');
       console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     }).format(value);
-  };
 
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString('pt-BR');
-  };
+  /* ===========================================
+     🔥 FUNÇÃO QUE CALCULA RECEITAS E DESPESAS
+     =========================================== */
+  const { totalReceitas, totalDespesas, saldo } = useMemo(() => {
+    let receitas = 0;
+    let despesas = 0;
 
-  // 📊 Agrupar lançamentos por dia
-  const chartData = lancamentos.reduce((acc, lanc) => {
-    if (!lanc.data) return acc;
-
-    const dataFormatada = new Date(lanc.data).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
+    lancamentos.forEach((l) => {
+      if (l.tipoLancamento === 0) receitas += l.valor;
+      if (l.tipoLancamento === 1) despesas += l.valor;
     });
 
-    const existing = acc.find(item => item.data === dataFormatada);
+    return {
+      totalReceitas: receitas,
+      totalDespesas: despesas,
+      saldo: receitas - despesas,
+    };
+  }, [lancamentos]);
 
-    if (existing) {
-      if (lanc.tipoLancamento === 0) {
-        existing.receitas += lanc.valor;
-      } else if (lanc.tipoLancamento === 1) {
-        existing.despesas += lanc.valor;
+  /* ===========================================
+     📊 AGRUPAR POR DIA PARA O GRÁFICO
+     =========================================== */
+  const chartData = useMemo(() => {
+    const grouped: {
+      [key: string]: { data: string; receitas: number; despesas: number };
+    } = {};
+
+    lancamentos.forEach((l) => {
+      if (!l.data) return;
+
+      const dia = new Date(l.data).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+      });
+
+      if (!grouped[dia]) {
+        grouped[dia] = { data: dia, receitas: 0, despesas: 0 };
       }
-    } else {
-      acc.push({
-        data: dataFormatada,
-        receitas: lanc.tipoLancamento === 0 ? lanc.valor : 0,
-        despesas: lanc.tipoLancamento === 1 ? lanc.valor : 0,
+
+      if (l.tipoLancamento === 0) grouped[dia].receitas += l.valor;
+      if (l.tipoLancamento === 1) grouped[dia].despesas += l.valor;
+    });
+
+    return Object.values(grouped);
+  }, [lancamentos]);
+
+  /* ===========================================
+     🚨 ALERTAS INTELIGENTES
+     =========================================== */
+  const alerts = useMemo(() => {
+    const list = [];
+
+    if (totalDespesas > totalReceitas) {
+      list.push({
+        message: 'Suas despesas estão maiores que suas receitas!',
+        type: 'danger',
       });
     }
 
-    return acc;
-  }, [] as { data: string; receitas: number; despesas: number }[]);
+    if (saldo > 0) {
+      list.push({
+        message: 'Você está economizando este mês 👏',
+        type: 'success',
+      });
+    }
+
+    if (totalDespesas > 0 && totalDespesas > totalReceitas * 0.8) {
+      list.push({
+        message: 'Atenção: você já gastou mais de 80% do que ganhou.',
+        type: 'warning',
+      });
+    }
+
+    return list;
+  }, [totalReceitas, totalDespesas, saldo]);
 
   if (isLoading) {
     return (
@@ -89,108 +143,150 @@ export function DashboardPage() {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-8">
 
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Visão geral das suas finanças</p>
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-[#4B0012]">
+              Dashboard
+            </h1>
+            <p className="text-gray-600">
+              Visão geral das suas finanças
+            </p>
+          </div>
+
+          <Button
+            className="bg-[#FFC107] hover:bg-[#FFB300] text-black"
+            onClick={() => navigate('/lancamentos/novo')}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Lançamento
+          </Button>
         </div>
 
-        {/* Cards */}
+        {/* CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-          <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-            <div className="flex items-start justify-between">
+          <Card className="p-6 bg-green-50 border-green-200">
+            <div className="flex justify-between">
               <div>
-                <p className="text-sm font-medium text-green-700">Total Receitas</p>
+                <p className="text-sm text-green-700">Receitas</p>
                 <p className="text-2xl font-bold text-green-900 mt-2">
-                  {formatCurrency(somatoria?.totalReceitas || 0)}
+                  {formatCurrency(totalReceitas)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
+              <TrendingUp className="w-8 h-8 text-green-600" />
             </div>
           </Card>
 
-          <Card className="p-6 bg-gradient-to-br from-red-50 to-red-100 border-red-200">
-            <div className="flex items-start justify-between">
+          <Card className="p-6 bg-red-50 border-red-200">
+            <div className="flex justify-between">
               <div>
-                <p className="text-sm font-medium text-red-700">Total Despesas</p>
+                <p className="text-sm text-red-700">Despesas</p>
                 <p className="text-2xl font-bold text-red-900 mt-2">
-                  {formatCurrency(somatoria?.totalDespesas || 0)}
+                  {formatCurrency(totalDespesas)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
-                <TrendingDown className="w-6 h-6 text-white" />
-              </div>
+              <TrendingDown className="w-8 h-8 text-red-600" />
             </div>
           </Card>
 
-          <Card className="p-6 bg-gradient-to-br from-[#4B0012]/10 to-[#4B0012]/20 border-[#4B0012]/30">
-            <div className="flex items-start justify-between">
+          <Card className="p-6 bg-[#4B0012]/10 border-[#4B0012]/30">
+            <div className="flex justify-between">
               <div>
-                <p className="text-sm font-medium text-[#4B0012]">Saldo</p>
+                <p className="text-sm text-[#4B0012]">Saldo</p>
                 <p className="text-2xl font-bold text-[#4B0012] mt-2">
-                  {formatCurrency(somatoria?.saldo || 0)}
+                  {formatCurrency(saldo)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-[#4B0012] rounded-full flex items-center justify-center">
-                <Wallet className="w-6 h-6 text-white" />
-              </div>
+              <Wallet className="w-8 h-8 text-[#4B0012]" />
             </div>
           </Card>
 
         </div>
 
-        {/* Gráfico */}
-        <Card className="p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">
-            Receitas x Despesas (Mês Atual)
-          </h2>
+        {/* GRÁFICO + ALERTAS */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="data" />
-              <YAxis />
-              <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-              <Legend />
-              <Bar dataKey="receitas" fill="#10B981" name="Receitas" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="despesas" fill="#EF4444" name="Despesas" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
+          {/* Gráfico ocupa 2 colunas */}
+          <div className="lg:col-span-2">
+            <Card className="p-6">
+              <h2 className="text-xl font-bold mb-6">
+                Receitas x Despesas (Mês Atual)
+              </h2>
+
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="data" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                  <Legend />
+                  <Bar dataKey="receitas" fill="#10B981" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="despesas" fill="#EF4444" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+          </div>
+
+          {/* ALERTAS */}
+          <div>
+            <Card className="p-6 sticky top-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-[#4B0012]" />
+                Alertas
+              </h3>
+
+              <div className="space-y-3">
+                {alerts.length === 0 && (
+                  <p className="text-sm text-gray-500">
+                    Nenhum alerta no momento.
+                  </p>
+                )}
+
+                {alerts.map((alert, index) => (
+                  <div
+                    key={index}
+                    className={`p-3 rounded-lg text-sm font-medium ${
+                      alert.type === 'danger'
+                        ? 'bg-red-100 text-red-700'
+                        : alert.type === 'warning'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-green-100 text-green-700'
+                    }`}
+                  >
+                    {alert.message}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+
+        </div>
 
         {/* Últimos Lançamentos */}
         <Card className="p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl font-bold mb-4">
             Últimos Lançamentos
           </h2>
 
           <div className="space-y-3">
-            {lancamentos.slice(0, 5).map((lanc) => {
-              const isReceita = lanc.tipoLancamento === 0;
+            {lancamentos.slice(0, 5).map((l) => {
+              const isReceita = l.tipoLancamento === 0;
 
               return (
                 <div
-                  key={lanc.idLancamento}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  key={l.idLancamento}
+                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-2 h-2 rounded-full ${
-                        isReceita ? 'bg-green-500' : 'bg-red-500'
-                      }`}
-                    />
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {lanc.descricaoLancamento}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {formatDate(lanc.data)}
-                      </p>
-                    </div>
+                  <div>
+                    <p className="font-medium">
+                      {l.descricaoLancamento}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(l.data!).toLocaleDateString('pt-BR')}
+                    </p>
                   </div>
 
                   <p
@@ -198,7 +294,7 @@ export function DashboardPage() {
                       isReceita ? 'text-green-600' : 'text-red-600'
                     }`}
                   >
-                    {isReceita ? '+' : '-'} {formatCurrency(lanc.valor)}
+                    {isReceita ? '+' : '-'} {formatCurrency(l.valor)}
                   </p>
                 </div>
               );
