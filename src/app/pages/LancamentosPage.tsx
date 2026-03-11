@@ -25,7 +25,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../components/ui/alert-dialog';
-import { Plus, Trash2, Filter } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '../components/ui/dialog';
+import { Plus, Trash2, Filter, Edit2 } from 'lucide-react';
 import { lancamentoService } from '../../services/lancamentoService';
 import type { Lancamento } from '../../types';
 import { toast } from 'sonner';
@@ -34,6 +41,7 @@ export function LancamentosPage() {
   const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
   const [filteredLancamentos, setFilteredLancamentos] = useState<Lancamento[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [editData, setEditData] = useState<Lancamento | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [filterYear, setFilterYear] = useState('');
   const [filterMonth, setFilterMonth] = useState('');
@@ -79,6 +87,21 @@ export function LancamentosPage() {
     setFilteredLancamentos(filtered);
   };
 
+  const handleEdit = async () => {
+    if (!editData) return;
+
+    try {
+      await lancamentoService.update(editData.idLancamento, editData);
+      setLancamentos(prev => prev.map(l => l.idLancamento === editData.idLancamento ? editData : l));
+
+      toast.success('Lançamento atualizado com sucesso!');
+      setEditData(null);
+    } catch (error: any) {
+      toast.error('Erro ao atualizar lançamento');
+      console.error(error);
+    }
+  };
+  
   const handleDelete = async () => {
     if (!deleteId) return;
 
@@ -180,12 +203,12 @@ export function LancamentosPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Data</TableHead>
+                <TableHead className="text-left pl-6">Data</TableHead>
                 <TableHead>Descrição</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Valor</TableHead>
+                <TableHead className="text-left pl-6">Tipo</TableHead>
+                <TableHead className="text-left pl-6">Valor</TableHead>
                 <TableHead>Observação</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
+                <TableHead className="text-right pr-6">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -225,13 +248,19 @@ export function LancamentosPage() {
                       {lanc.observacaoLancamento || '-'}
                     </TableCell>
                     <TableCell className="text-right">
+                      <button
+                          onClick={() => setEditData(lanc)}
+                          className="p-2 text-[#FFD700] hover:bg-[#FFD700] hover:text-[#1a1a1a] rounded-lg transition-all"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setDeleteId(lanc.idLancamento)}
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />
-                      </Button>
+                      </Button> 
                     </TableCell>
                   </TableRow>
                 ))
@@ -239,6 +268,49 @@ export function LancamentosPage() {
             </TableBody>
           </Table>
         </Card>
+
+        {/* Edit Dialog */}
+        <Dialog open={!!editData} onOpenChange={() => setEditData(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar Lançamento</DialogTitle>
+            </DialogHeader>
+
+            {editData && (
+              <><div className="space-y-4">
+                <div>
+                  <Label>Descrição</Label>
+                  <Input
+                    value={editData.descricaoLancamento}
+                    onChange={(e) => setEditData({ ...editData, descricaoLancamento: e.target.value })}
+                    className="mt-1" />
+                </div>
+              </div><div>
+                  <Label>Valor</Label>
+                  <Input
+                    type="number"
+                    value={editData?.valor}
+                    onChange={(e) => setEditData({
+                      ...editData!,
+                      valor: parseFloat(e.target.value),
+                    })}
+
+                    className="mt-1" />
+                </div></>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditData(null)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleEdit} className="bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium">
+                Salvar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+                
+
+
 
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
