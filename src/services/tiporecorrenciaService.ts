@@ -22,7 +22,7 @@ export const tipoRecorrenciaService = {
     },
 
     async delete(id: number) : Promise<void> {
-        return apiRequest<void>('TipoRecorrencia/${id}', {
+        return apiRequest<void>('/TipoRecorrencia/${id}', {
             method : 'DELETE',
         });
     },

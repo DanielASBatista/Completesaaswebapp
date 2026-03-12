@@ -11,6 +11,23 @@ import {
   TableHeader,
   TableRow,
 } from '../components/ui/table';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../components/ui/alert-dialog';
+/*import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '../components/ui/dialog';*/
 import { Plus, Trash2 } from 'lucide-react';
 import { recorrenciaService } from '../../services/recorrenciaService';
 import type { Recorrencia } from '../../types';
@@ -20,6 +37,7 @@ import { Link } from 'react-router';
 export function RecorrenciasPage() {
   const [recorrencias, setRecorrencias] = useState<Recorrencia[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
     loadRecorrencias();
@@ -37,6 +55,20 @@ export function RecorrenciasPage() {
       setIsLoading(false);
     }
   };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+
+    try {
+      await recorrenciaService.delete(deleteId);
+      toast.success('Recorrência excluída com sucesso');
+      setRecorrencias(prev => prev.filter(l => l.idRecorrente !== deleteId));
+      setDeleteId(null);
+    } catch (error: any) {
+      toast.error('Erro ao excluir recorrência');
+      console.error(error);
+    }
+  }
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -105,7 +137,11 @@ export function RecorrenciasPage() {
                     <TableCell>{rec.qtdeRecorrente}x</TableCell>
                     <TableCell>{rec.idProjecao}</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setDeleteId(rec.idRecorrente)}
+                      >
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>
                     </TableCell>
@@ -115,6 +151,26 @@ export function RecorrenciasPage() {
             </TableBody>
           </Table>
         </Card>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tem certeza que deseja excluir esta recorrência? Esta ação não pode ser desfeita.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete}
+                className="bg-red-600 hover:bg-red-700 text-white font-medium"
+              >
+                Excluir
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </Layout>
   );
