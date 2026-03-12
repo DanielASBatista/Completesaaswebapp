@@ -191,26 +191,19 @@ export function NovaRecorrenciaPage() {
             {/* Tipo Recorrência */}
             <div>
               <Label>Tipo de Recorrência *</Label>
-              <Select
-                value={formData.IdTipoRecorrencia}
-                onValueChange={(value) =>
-                  handleChange('IdTipoRecorrencia', value)
-                }
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Selecione um tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {tiposRecorrencia.map((tipo) => (
-                    <SelectItem
-                      key={tipo.id}
-                      value={tipo.id.toString()}
-                    >
-                      {tipo.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <select
+  value={formData.IdTipoRecorrencia}
+  onChange={(e) =>
+    handleChange('IdTipoRecorrencia', e.target.value)
+  }
+>
+  <option value="">Selecione</option>
+  {tiposRecorrencia.map((tipo) => (
+    <option key={tipo.id} value={tipo.id}>
+      {tipo.nome}
+    </option>
+  ))}
+</select>
             </div>
 
             {/* Observação */}
