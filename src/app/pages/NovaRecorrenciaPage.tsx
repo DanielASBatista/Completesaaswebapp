@@ -71,7 +71,7 @@ export function NovaRecorrenciaPage() {
       valor: parseFloat(formData.Valor),
       dataInicio: new Date(formData.DataInicio).toISOString(),
       qtdeRecorrente: Number(formData.QtdeRecorrente),
-      tipoRecorrenciaId: Number(formData.IdTipoRecorrencia)
+      idTipoRecorrencia: Number(formData.IdTipoRecorrencia)
     });
 
       toast.success('Recorrência criada com sucesso!');

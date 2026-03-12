@@ -67,7 +67,7 @@ export interface Recorrencia {
   dataInicio: string; // ISO date string
   qtdeRecorrente: number;
   obRecorrente: string;
-  tipoRecorrenciaId: number;
+  idTipoRecorrencia: number;
   tipoRecorrencia?: TipoRecorrencia 
 }
 
