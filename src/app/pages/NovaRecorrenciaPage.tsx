@@ -39,10 +39,11 @@ export function NovaRecorrenciaPage() {
   });
 
   useEffect(() => {
-    tipoRecorrenciaService.getAll().then((res) => {
-      setTiposRecorrencia(res);
-    });
-  }, []);
+  tipoRecorrenciaService.getAll().then((res) => {
+    console.log("TIPOS:", res);
+    setTiposRecorrencia(res);
+  });
+}, []);
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
