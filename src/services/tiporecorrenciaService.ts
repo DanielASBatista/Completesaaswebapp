@@ -3,7 +3,7 @@ import type { TipoRecorrencia } from "../types";
 
 export const tipoRecorrenciaService = {
     async getAll(): Promise<TipoRecorrencia[]> {
-        return apiRequest<TipoRecorrencia[]>('TipoRecorrencia/GetAll');
+        return apiRequest<TipoRecorrencia[]>('/TipoRecorrencia/GetAll');
     },
 
     async getById(id: number): Promise<TipoRecorrencia> {
