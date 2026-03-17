@@ -32,7 +32,7 @@ export function ProjecoesPage() {
   const [projecoes, setProjecoes] = useState<Projecao[]>([]);
   const [filteredProjecoes, setFilteredProjecoes] = useState<Projecao[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [editData, setEditData] = useState(true);
+  const [editData, setEditData] = useState<Projecao | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [filterYear, setFilterYear] = useState('');
   const [filterMonth, setFilterMonth] = useState('');
@@ -77,7 +77,7 @@ export function ProjecoesPage() {
 
     try {
       await projecaoService.update(editData.idProjecao, editData);
-      setProjecoes(prev => prev.map(p => p.idProjecao === editData.idProjecao ? editData : 1))
+      setProjecoes(prev => prev.map(p => p.idProjecao === editData.idProjecao ? editData : p));
 
       toast.success('Projeção atualizada com sucesso!');
       setEditData(null);
@@ -85,7 +85,7 @@ export function ProjecoesPage() {
       toast.error('Erro ao atualizar lançamento.')
       console.error(error);
     }
-  }
+  };
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -180,7 +180,7 @@ export function ProjecoesPage() {
                 <TableHead>Valor Previsto</TableHead>
                 <TableHead>Data Referência</TableHead>
                 <TableHead>Data Criação</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
+                <TableHead className="text-right pr-6">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -199,6 +199,13 @@ export function ProjecoesPage() {
                     <TableCell>{formatDate(proj.dataReferencia)}</TableCell>
                     <TableCell>{formatDate(proj.dataCriacao)}</TableCell>
                     <TableCell className="text-right">
+                      <Button 
+                              className="p-2 text-[#FFD700] hover:bg-[#FFD700] hover:text-[#1a1a1a] rounded-lg transition-all"
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => setEditData(proj)}>
+                        <Edit2 className="w-4 h-4 text" />
+                      </Button>
                       <Button variant="ghost" size="sm" onClick={() => setDeleteId(proj.idProjecao)}>
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>
@@ -209,6 +216,47 @@ export function ProjecoesPage() {
             </TableBody>
           </Table>
         </Card>
+
+        {/* Edit Dialog */}
+        <Dialog open={!!editData} onOpenChange={() => setEditData(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar Projeção</DialogTitle>
+            </DialogHeader>
+
+            {editData && (
+              <><div className="space-y-4">
+                <div>
+                  <Label>Descrição</Label>
+                  <Input
+                    value={editData.dsProjecao}
+                    onChange={(e) => setEditData({ ...editData, dsProjecao: e.target.value })}
+                    className="mt-1" />
+                </div>
+              </div><div>
+                  <Label>Valor</Label>
+                  <Input
+                    type="number"
+                    value={editData?.valorPrevisto}
+                    onChange={(e) => setEditData({
+                      ...editData!,
+                      valorPrevisto: parseFloat(e.target.value),
+                    })}
+
+                    className="mt-1" />
+                </div></>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditData(null)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleEdit} className="bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium">
+                Salvar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
 
         {/* Delete Dialog */}
         <AlertDialog open={deleteId !== null} onOpenChange={open => { if (!open) setDeleteId(null); }}>
