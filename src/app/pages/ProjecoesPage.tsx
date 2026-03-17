@@ -15,15 +15,24 @@ import {
   TableRow,
 } from '../components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
-import { Plus, Trash2, Filter} from 'lucide-react';
+import { Plus, Trash2, Filter, Edit2} from 'lucide-react';
 import { projecaoService } from '../../services/projecaoService';
 import type { Projecao } from '../../types';
 import { toast } from 'sonner';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '../components/ui/dialog';
 
 export function ProjecoesPage() {
   const [projecoes, setProjecoes] = useState<Projecao[]>([]);
   const [filteredProjecoes, setFilteredProjecoes] = useState<Projecao[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [editData, setEditData] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [filterYear, setFilterYear] = useState('');
   const [filterMonth, setFilterMonth] = useState('');
@@ -62,6 +71,21 @@ export function ProjecoesPage() {
 
     setFilteredProjecoes(filtered);
   };
+
+  const handleEdit = async () => {
+    if (!editData) return;
+
+    try {
+      await projecaoService.update(editData.idProjecao, editData);
+      setProjecoes(prev => prev.map(p => p.idProjecao === editData.idProjecao ? editData : 1))
+
+      toast.success('Projeção atualizada com sucesso!');
+      setEditData(null);
+    } catch (error: any) {
+      toast.error('Erro ao atualizar lançamento.')
+      console.error(error);
+    }
+  }
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);

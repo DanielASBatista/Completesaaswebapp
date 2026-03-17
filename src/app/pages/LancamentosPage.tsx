@@ -97,7 +97,7 @@ export function LancamentosPage() {
       toast.success('Lançamento atualizado com sucesso!');
       setEditData(null);
     } catch (error: any) {
-      toast.error('Erro ao atualizar lançamento');
+      toast.error('Erro ao atualizar lançamento.      ');
       console.error(error);
     }
   };
