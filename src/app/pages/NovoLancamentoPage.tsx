@@ -142,16 +142,16 @@ export function NovoLancamentoPage() {
               </div>
 
               <div>
-                <Label htmlFor="data">Data *</Label>
-                <Input
-                  id="data"
-                  type="data"
-                  value={formData.Data}
-                  onChange={(e) => handleChange('Data', e.target.value)}
-                  required
-                  className="mt-1"
-                />
-              </div>
+              <Label htmlFor="data">Data *</Label>
+              <Input
+                id="data"
+                type="date"
+                value={formData.Data}
+                onChange={(e) => handleChange('Data', e.target.value)}
+                required
+                className="mt-1"
+              />
+            </div>
             
             <div>
                 <Label htmlFor="frequenciaLancamento">Frequencia de Recorrencia</Label>
