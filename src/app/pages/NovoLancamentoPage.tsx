@@ -23,12 +23,18 @@ export function NovoLancamentoPage() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
+
   const [formData, setFormData] = useState({
     TipoLancamento: 'RECEITA',
     DescricaoLancamento: '',
     ObservacaoLancamento: '',
     Valor: '',
     Data: new Date().toISOString().split('T')[0],
+    FrequenciaRecorrencia:'',
+    Ocorrencia:'',
+    ModoMensal:'',
+    DiaDoMes:'',
+    IntervaloDias:'',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,6 +54,11 @@ export function NovoLancamentoPage() {
         observacaoLancamento: formData.ObservacaoLancamento,
         valor: parseFloat(formData.Valor),
         data: new Date(formData.Data).toISOString(),
+        frequenciaRecorrencia: Number(formData.FrequenciaRecorrencia),
+        ocorrencia: Number(formData.Ocorrencia),
+        modomensal: Number(formData.ModoMensal),
+        diadomes: Number(formData.DiaDoMes),
+        intervalodias: Number(formData.IntervaloDias)
       });
 
       toast.success('Lançamento criado com sucesso!');
@@ -134,9 +145,21 @@ export function NovoLancamentoPage() {
                 <Label htmlFor="data">Data *</Label>
                 <Input
                   id="data"
-                  type="date"
+                  type="number"
                   value={formData.Data}
                   onChange={(e) => handleChange('Data', e.target.value)}
+                  required
+                  className="mt-1"
+                />
+              </div>
+            
+            <div>
+                <Label htmlFor="frequenciaLancamento">Frequencia de Recorrencia</Label>
+                <Input
+                  id="frequenciaLancamento"
+                  type="date"
+                  value={formData.FrequenciaRecorrencia}
+                  onChange={(e) => handleChange('FrequenciaLancamento', e.target.value)}
                   required
                   className="mt-1"
                 />

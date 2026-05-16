@@ -28,6 +28,11 @@ export interface Lancamento {
   idSimEmprestimo?: number | null;
   idRecorrente?: number | null;
   tipoLancamento: number; // 0 para receita, 1 para despesa
+  frequenciaRecorrencia: number;
+  ocorrencia: number;
+  modomensal: number;
+  diadomes: number;
+  intervalodias: number; 
   descricaoLancamento: string;
   observacaoLancamento: string;
   valor: number;
