@@ -145,7 +145,7 @@ export function NovoLancamentoPage() {
                 <Label htmlFor="data">Data *</Label>
                 <Input
                   id="data"
-                  type="number"
+                  type="data"
                   value={formData.Data}
                   onChange={(e) => handleChange('Data', e.target.value)}
                   required
