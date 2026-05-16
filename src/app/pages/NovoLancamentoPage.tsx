@@ -157,7 +157,7 @@ export function NovoLancamentoPage() {
                 <Label htmlFor="frequenciaLancamento">Frequencia de Recorrencia</Label>
                 <Input
                   id="frequenciaLancamento"
-                  type="date"
+                  type="number"
                   value={formData.FrequenciaRecorrencia}
                   onChange={(e) => handleChange('FrequenciaLancamento', e.target.value)}
                   required
