@@ -160,7 +160,6 @@ export function NovoLancamentoPage() {
                   type="number"
                   value={formData.FrequenciaRecorrencia}
                   onChange={(e) => handleChange('FrequenciaLancamento', e.target.value)}
-                  required
                   className="mt-1"
                 />
               </div>
