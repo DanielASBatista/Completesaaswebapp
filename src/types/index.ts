@@ -22,22 +22,43 @@ export interface Empresa {
 }
 
 export interface Lancamento {
+
   idLancamento: number;
+
   idUsuario: number;
+
   idProjecao?: number | null;
+
   idSimEmprestimo?: number | null;
-  idRecorrente?: number | null;
-  tipoLancamento: number; // 0 para receita, 1 para despesa
-  frequenciaRecorrencia: number;
-  ocorrencia: number;
-  modomensal: number;
-  diadomes: number;
-  intervalodias: number; 
+
+  idRecorrencia?: number | null;
+
+  tipoLancamento: number;
+
   descricaoLancamento: string;
-  observacaoLancamento: string;
+
+  observacaoLancamento?: string | null;
+
   valor: number;
-  data: string; // ISO date string
-  dataCriacao: string; // ISO date string
+
+  data: string;
+
+  dataCriacao?: string;
+
+  recorrencia?: RecorrenciaDTO | null;
+}
+
+export interface RecorrenciaDTO {
+
+  frequenciaRecorrencia: number;
+
+  qtdeRecorrencia: number;
+
+  modoRecorrenciaMensal?: number | null;
+
+  dataRecorrencia?: number | null;
+
+  diasIntervalo?: number | null;
 }
 
 export interface Emprestimo {
