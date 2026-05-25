@@ -85,16 +85,29 @@ export interface Projecao {
 }
 
 export interface Recorrencia {
+
   idRecorrente: number;
+
   idProjecao: number;
-  tipoLancamento: number; // 0 para receita, 1 para despesa
+
+  tipoLancamento: number;
+
   dsRecorrente: string;
+
   valor: number;
-  dataInicio: string; // ISO date string
+
+  dataInicio: string;
+
   qtdeRecorrente: number;
-  obRecorrente: string;
+
+  obRecorrente?: string;
+
   idTipoRecorrencia: number;
-  tipoRecorrencia?: TipoRecorrencia 
+
+  tipoRecorrencia?: {
+    id: number;
+    nome: string;
+  };
 }
 
 export interface Responsavel {
