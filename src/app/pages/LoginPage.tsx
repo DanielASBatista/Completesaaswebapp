@@ -86,8 +86,10 @@ export function LoginPage() {
       {/* Navbar */}
       <header className="relative z-10 flex items-center px-10 py-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#5A0015] to-[#7A001C] shadow-2xl">
-            <Sparkles className="h-7 w-7 text-[#FFC107]" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white">
+            <img src="/src/Imagens/logo.png"
+                 alt="Logo"
+                 className="h-10 w-10 object-contain"/>
           </div>
 
           <div>
