@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import { useAuth } from '../../context/AuthContext';
 
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -28,8 +29,8 @@ export function LoginPage() {
   const [nome, setNome] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-
+  const [showLogin, setShowLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -83,23 +84,23 @@ export function LoginPage() {
       </div>
 
       {/* Navbar */}
-<header className="relative z-10 flex items-center px-10 py-6">
-  <div className="flex items-center gap-3">
-    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#5A0015] to-[#7A001C] shadow-2xl">
-      <Sparkles className="h-7 w-7 text-[#FFC107]" />
-    </div>
+      <header className="relative z-10 flex items-center px-10 py-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#5A0015] to-[#7A001C] shadow-2xl">
+            <Sparkles className="h-7 w-7 text-[#FFC107]" />
+          </div>
 
-    <div>
-      <h1 className="text-2xl font-black tracking-wide">
-        Projeto Midas
-      </h1>
+          <div>
+            <h1 className="text-2xl font-black tracking-wide">
+              Projeto Midas
+            </h1>
 
-      <p className="text-sm text-gray-300">
-        Gestão Financeira Inteligente
-      </p>
-    </div>
-  </div>
-</header>
+            <p className="text-sm text-gray-300">
+              Gestão Financeira Inteligente
+            </p>
+          </div>
+        </div>
+      </header>
       {/* Hero */}
       <main className="relative z-10 flex min-h-[85vh] items-center justify-between px-10">
         {/* Left */}
@@ -149,11 +150,10 @@ export function LoginPage() {
 
         {/* Login Card */}
         <section
-          className={`transition-all duration-700 ${
-            showLogin
-              ? 'translate-y-0 opacity-100'
-              : 'translate-y-10 opacity-0'
-          }`}
+          className={`transition-all duration-700 ${showLogin
+            ? 'translate-y-0 opacity-100'
+            : 'translate-y-10 opacity-0'
+            }`}
         >
           <div className="w-[420px] rounded-3xl border border-white/10 bg-white/10 p-8 shadow-2xl backdrop-blur-2xl">
             <div className="mb-8">
@@ -203,13 +203,21 @@ export function LoginPage() {
 
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Digite sua senha"
                     required
                     className="h-12 rounded-xl border-white/10 bg-white/10 pl-11 text-white placeholder:text-gray-400"
                   />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  >
+                    {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                  </button>
                 </div>
               </div>
 
