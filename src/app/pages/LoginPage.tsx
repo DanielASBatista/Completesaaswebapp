@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import { useAuth } from '../../context/AuthContext';
-
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -17,7 +16,6 @@ import {
   Lock,
   PiggyBank,
   ShieldCheck,
-  Sparkles,
   TrendingUp,
   User,
   Wallet,
@@ -87,7 +85,7 @@ export function LoginPage() {
       <header className="relative z-10 flex items-center px-10 py-6">
         <div className="flex items-center gap-3">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white">
-            <img src="/src/Imagens/logo.png"
+            <img src= "/image.png"
                  alt="Logo"
                  className="h-10 w-10 object-contain"/>
           </div>

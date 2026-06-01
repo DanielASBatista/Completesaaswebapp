@@ -278,7 +278,7 @@ export function NovoLancamentoPage() {
                 </Label>
 
                 <Input
-                  type="number"
+                  type="currency"
                   step="0.01"
                   min="0"
                   value={formData.valor}
