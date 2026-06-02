@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { CurrencyInput } from 'react-currency-input-field';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
@@ -277,21 +278,23 @@ export function NovoLancamentoPage() {
                   Valor *
                 </Label>
 
-                <Input
-                  type="currency"
-                  step="0.01"
-                  min="0"
+                <CurrencyInput
+                  className="text-gray-600 mt-1"
+                  id="valor"
+                  name="valor"
+                  placeholder="R$ 0,00"
+                  decimalsLimit={2}
+                  decimalSeparator=","
+                  groupSeparator="."
+                  prefix="R$ "
                   value={formData.valor}
-                  onChange={(e) =>
+                  onValueChange={(value) =>
                     handleChange(
                       'valor',
-                      e.target.value
+                      value || ''
                     )
                   }
-                  required
-                  className="mt-1"
                 />
-
               </div>
 
               <div>
