@@ -18,6 +18,8 @@ import { Plus, Trash2, Edit2 } from 'lucide-react';
 import { emprestimoService } from '../../services/emprestimoService';
 import type { Emprestimo } from '../../types';
 import { toast } from 'sonner';
+import { useAuth } from '../../context/AuthContext';
+import { canManageModule, isCompanyAdmin } from '../../utils/permissions';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
    AlertDialogTitle } from '../components/ui/alert-dialog';
 import {
@@ -29,6 +31,9 @@ import {
 } from '../components/ui/dialog';
 
 export function EmprestimosPage() {
+  const { user } = useAuth();
+  const canManage = canManageModule(user, 'emprestimos');
+  const isAdmin = isCompanyAdmin(user);
   const [emprestimos, setEmprestimos] = useState<Emprestimo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editData, setEditData] = useState<Emprestimo | null>(null);
@@ -41,7 +46,9 @@ export function EmprestimosPage() {
   const loadEmprestimos = async () => {
     try {
       setIsLoading(true);
-      const data = await emprestimoService.getAll();
+      const data = isAdmin
+        ? await emprestimoService.getAll()
+        : await emprestimoService.getAllEmpresa();
       setEmprestimos(data);
     } catch (error: any) {
       toast.error('Erro ao carregar empréstimos');
@@ -107,7 +114,7 @@ export function EmprestimosPage() {
             <h1 className="text-3xl font-bold text-gray-900">Empréstimos</h1>
             <p className="text-gray-600 mt-1">Gerencie seus empréstimos e financiamentos</p>
           </div>
-          <Link to="/emprestimos/novo">
+          <Link to="/emprestimos/novo" className={canManage ? '' : 'hidden'}>
             <Button className="bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium">
               <Plus className="w-4 h-4 mr-2" />
               Novo Empréstimo
@@ -171,10 +178,11 @@ export function EmprestimosPage() {
                               className="p-2 text-[#FFD700] hover:bg-[#FFD700] hover:text-[#1a1a1a] rounded-lg transition-all"
                               variant="ghost" 
                               size="sm"
+                              disabled={!canManage}
                               onClick={() => setEditData(emp)}>
                         <Edit2 className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => setDeleteId(emp.idSimEmprestimo)}>
+                      <Button variant="ghost" size="sm" className={canManage ? '' : 'hidden'} onClick={() => setDeleteId(emp.idSimEmprestimo)}>
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>
                     </TableCell>

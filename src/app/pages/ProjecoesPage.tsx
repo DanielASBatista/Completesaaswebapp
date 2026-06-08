@@ -15,10 +15,13 @@ import {
   TableRow,
 } from '../components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
-import { Plus, Trash2, Filter, Edit2} from 'lucide-react';
+import { Plus, Trash2, Filter, Edit2, Sparkles } from 'lucide-react';
 import { projecaoService } from '../../services/projecaoService';
 import type { Projecao } from '../../types';
 import { toast } from 'sonner';
+import { useAuth } from '../../context/AuthContext';
+import { canManageModule, isCompanyAdmin } from '../../utils/permissions';
+import { AnaliseIAProjecao } from '../components/AnaliseIAProjecao';
 
 import {
   Dialog,
@@ -29,6 +32,9 @@ import {
 } from '../components/ui/dialog';
 
 export function ProjecoesPage() {
+  const { user } = useAuth();
+  const canManage = canManageModule(user, 'projecoes');
+  const isAdmin = isCompanyAdmin(user);
   const [projecoes, setProjecoes] = useState<Projecao[]>([]);
   const [filteredProjecoes, setFilteredProjecoes] = useState<Projecao[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,7 +54,9 @@ export function ProjecoesPage() {
   const loadProjecoes = async () => {
     try {
       setIsLoading(true);
-      const data = await projecaoService.getAll();
+      const data = isAdmin
+        ? await projecaoService.getAll()
+        : await projecaoService.getAllEmpresa();
       setProjecoes(data);
     } catch (error: any) {
       toast.error('Erro ao carregar projeções');
@@ -122,7 +130,7 @@ export function ProjecoesPage() {
             <h1 className="text-3xl font-bold text-gray-900">Projeções</h1>
             <p className="text-gray-600 mt-1">Planeje suas receitas e despesas futuras</p>
           </div>
-          <Link to="/projecoes/nova">
+          <Link to="/projecoes/nova" className={canManage ? '' : 'hidden'}>
             <Button className="bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium">
               <Plus className="w-4 h-4 mr-2" />
               Nova Projeção
@@ -180,13 +188,14 @@ export function ProjecoesPage() {
                 <TableHead>Valor Previsto</TableHead>
                 <TableHead>Data Referência</TableHead>
                 <TableHead>Data Criação</TableHead>
+                <TableHead className="text-right">IA</TableHead>
                 <TableHead className="text-right pr-6">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredProjecoes.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                  <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                     Nenhuma projeção encontrada
                   </TableCell>
                 </TableRow>
@@ -199,14 +208,22 @@ export function ProjecoesPage() {
                     <TableCell>{formatDate(proj.dataReferencia)}</TableCell>
                     <TableCell>{formatDate(proj.dataCriacao)}</TableCell>
                     <TableCell className="text-right">
+                      <AnaliseIAProjecao
+                        projecaoId={proj.idProjecao}
+                        titulo={proj.titulo}
+                        valorPrevisto={proj.valorPrevisto}
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
                       <Button 
                               className="p-2 text-[#FFD700] hover:bg-[#FFD700] hover:text-[#1a1a1a] rounded-lg transition-all"
                               variant="ghost" 
                               size="sm" 
+                              disabled={!canManage}
                               onClick={() => setEditData(proj)}>
                         <Edit2 className="w-4 h-4 text" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => setDeleteId(proj.idProjecao)}>
+                      <Button variant="ghost" size="sm" className={canManage ? '' : 'hidden'} onClick={() => setDeleteId(proj.idProjecao)}>
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>
                     </TableCell>

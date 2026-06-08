@@ -4,7 +4,9 @@ import type {
   LoginRequest, 
   LoginResponse, 
   RegistrarRequest,
-  AlterarSenhaRequest 
+  AlterarSenhaRequest,
+  AtualizarPerfilUsuarioRequest,
+  CriarUsuarioEmpresaRequest
 } from '../types';
 
 export const usuarioService = {
@@ -33,6 +35,10 @@ export const usuarioService = {
     return apiRequest<Usuario[]>('/Usuario/GetAll');
   },
 
+  async getUsuariosEmpresa(): Promise<Usuario[]> {
+    return apiRequest<Usuario[]>('/Usuario/Empresa');
+  },
+
   async getById(id: number): Promise<Usuario> {
     return apiRequest<Usuario>(`/Usuario/Get/${id}`);
   },
@@ -41,6 +47,20 @@ export const usuarioService = {
     return apiRequest<Usuario>('/Usuario/New', {
       method: 'POST',
       body: JSON.stringify(usuario),
+    });
+  },
+
+  async criarUsuarioEmpresa(usuario: CriarUsuarioEmpresaRequest): Promise<Usuario> {
+    return apiRequest<Usuario>('/Usuario/Empresa', {
+      method: 'POST',
+      body: JSON.stringify(usuario),
+    });
+  },
+
+  async atualizarPerfilEmpresa(id: number, data: AtualizarPerfilUsuarioRequest): Promise<void> {
+    return apiRequest<void>(`/Usuario/Empresa/${id}/Perfil`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
     });
   },
 

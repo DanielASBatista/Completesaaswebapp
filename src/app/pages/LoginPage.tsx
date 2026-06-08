@@ -85,7 +85,7 @@ export function LoginPage() {
       <header className="relative z-10 flex items-center px-10 py-6">
         <div className="flex items-center gap-3">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white">
-            <img src= "image.png"
+            <img src= "/image.png"
                  alt="Logo"
                  className="h-10 w-10 object-contain"/>
           </div>

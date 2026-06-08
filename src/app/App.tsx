@@ -13,6 +13,7 @@ import { RecorrenciasPage } from './pages/RecorrenciasPage';
 import { NovaRecorrenciaPage } from './pages/NovaRecorrenciaPage';
 import { EmpresaPage } from './pages/EmpresaPage';
 import { RegisterPage } from './pages/RegistrarPage';
+import { ModuleGuard } from './components/ModuleGuard';
 
 export default function App() {
   return (
@@ -23,11 +24,11 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/lancamentos" element={<LancamentosPage />} />
-          <Route path="/lancamentos/novo" element={<NovoLancamentoPage />} />
+          <Route path="/lancamentos/novo" element={<ModuleGuard module="lancamentos"><NovoLancamentoPage /></ModuleGuard>} />
           <Route path="/projecoes" element={<ProjecoesPage />} />
-          <Route path="/projecoes/nova" element={<NovaProjecaoPage />} />
+          <Route path="/projecoes/nova" element={<ModuleGuard module="projecoes"><NovaProjecaoPage /></ModuleGuard>} />
           <Route path="/emprestimos" element={<EmprestimosPage />} />
-          <Route path="/emprestimos/novo" element={<NovoEmprestimoPage />} />
+          <Route path="/emprestimos/novo" element={<ModuleGuard module="emprestimos"><NovoEmprestimoPage /></ModuleGuard>} />
           <Route path="/recorrencias" element={<RecorrenciasPage />} />
           <Route path="/recorrencias/novo" element={<NovaRecorrenciaPage />} />
           <Route path="/empresa" element={<EmpresaPage />} />

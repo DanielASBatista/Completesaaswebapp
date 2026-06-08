@@ -2,17 +2,22 @@
 
 export interface Usuario {
   IdUsuario: number;
+  idUsuario?: number;
   nomeUsuario: string;
   sobrenome: string;
   emailUsuario: string;
   telefone: string;
   PasswordString?: string;
   IdEmpresa: number;
+  idEmpresa?: number;
+  perfil?: string;
+  Perfil?: string;
   Token?: string;
 }
 
 export interface Empresa {
   IdEmpresa: number;
+  idEmpresa?: number;
   idResponsavel: number;
   razaoSocial: string;
   nomeFantasia: string;
@@ -126,12 +131,31 @@ export interface LoginRequest {
 
 export interface UsuarioAuth {
   id: number;
+  Id?: number;
   nomeUsuario: string;
+  NomeUsuario?: string;
+  idEmpresa: number;
+  IdEmpresa?: number;
+  perfil: string;
+  Perfil?: string;
 }
 
 export interface LoginResponse {
   token: string;
   usuario: UsuarioAuth;
+}
+
+export interface CriarUsuarioEmpresaRequest {
+  nomeUsuario: string;
+  passwordString: string;
+  perfil: string;
+  sobrenome?: string;
+  emailUsuario?: string;
+  telefone?: string;
+}
+
+export interface AtualizarPerfilUsuarioRequest {
+  perfil: string;
 }
 
 export interface RegistrarRequest {

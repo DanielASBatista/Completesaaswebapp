@@ -45,4 +45,12 @@ export const lancamentoService = {
   async getSomatoria(): Promise<SomatoriaResponse> {
     return apiRequest<SomatoriaResponse>('/Lancamentos/somatoria');
   },
+
+  async getAllEmpresa(): Promise<Lancamento[]> {
+    return apiRequest<Lancamento[]>('/Lancamentos/Empresa');
+  },
+
+  async getSomatoriaEmpresa(): Promise<SomatoriaResponse> {
+    return apiRequest<SomatoriaResponse>('/Lancamentos/Empresa/Somatoria');
+  },
 };

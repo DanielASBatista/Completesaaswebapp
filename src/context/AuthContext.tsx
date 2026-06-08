@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => void;
+  updateUser: (data: Partial<Usuario>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,10 +41,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   console.log("RESPOSTA LOGIN:", response);
 
-  localStorage.setItem('midas_token', response.token);
-  localStorage.setItem('midas_user', JSON.stringify(response));
+  const usuarioId = response.usuario.id || response.usuario.Id || 0;
+  const nomeUsuario = response.usuario.nomeUsuario || response.usuario.NomeUsuario || '';
+  const idEmpresa = response.usuario.idEmpresa || response.usuario.IdEmpresa || 0;
+  const perfil = response.usuario.perfil || response.usuario.Perfil || '';
 
-  setUser(response as Usuario);
+  const authenticatedUser: Usuario = {
+    IdUsuario: usuarioId,
+    idUsuario: usuarioId,
+    nomeUsuario,
+    sobrenome: '',
+    emailUsuario: '',
+    telefone: '',
+    IdEmpresa: idEmpresa,
+    idEmpresa,
+    Perfil: perfil,
+    perfil,
+    Token: response.token,
+  };
+
+  localStorage.setItem('midas_token', response.token);
+  localStorage.setItem('midas_user', JSON.stringify(authenticatedUser));
+
+  setUser(authenticatedUser);
 };
 
 
@@ -53,6 +73,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   };
 
+  const updateUser = (data: Partial<Usuario>) => {
+    setUser(prev => {
+      if (!prev) return prev;
+
+      const updatedUser = { ...prev, ...data };
+      localStorage.setItem('midas_user', JSON.stringify(updatedUser));
+      return updatedUser;
+    });
+  };
+
   return (
     <AuthContext.Provider 
       value={{ 
@@ -60,7 +90,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!user, 
         isLoading,
         login, 
-        logout 
+        logout,
+        updateUser
       }}
     >
       {children}

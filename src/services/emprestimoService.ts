@@ -6,6 +6,10 @@ export const emprestimoService = {
     return apiRequest<Emprestimo[]>('/Emprestimos/GetAll');
   },
 
+  async getAllEmpresa(): Promise<Emprestimo[]> {
+    return apiRequest<Emprestimo[]>('/Emprestimos/Empresa');
+  },
+
   async getById(id: number): Promise<Emprestimo> {
     return apiRequest<Emprestimo>(`/Emprestimos/${id}`);
   },

@@ -36,8 +36,13 @@ import { Plus, Trash2, Filter, Edit2 } from 'lucide-react';
 import { lancamentoService } from '../../services/lancamentoService';
 import type { Lancamento } from '../../types';
 import { toast } from 'sonner';
+import { useAuth } from '../../context/AuthContext';
+import { canManageModule, isCompanyAdmin } from '../../utils/permissions';
 
 export function LancamentosPage() {
+  const { user } = useAuth();
+  const canManage = canManageModule(user, 'lancamentos');
+  const isAdmin = isCompanyAdmin(user);
   const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
   const [filteredLancamentos, setFilteredLancamentos] = useState<Lancamento[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,7 +62,9 @@ export function LancamentosPage() {
   const loadLancamentos = async () => {
     try {
       setIsLoading(true);
-      const data = await lancamentoService.getAll();
+      const data = isAdmin
+        ? await lancamentoService.getAll()
+        : await lancamentoService.getAllEmpresa();
       setLancamentos(data);
     } catch (error: any) {
       toast.error('Erro ao carregar lançamentos');
@@ -150,7 +157,7 @@ export function LancamentosPage() {
             <h1 className="text-3xl font-bold text-gray-900">Lançamentos</h1>
             <p className="text-gray-600 mt-1">Gerencie todas as suas movimentações financeiras</p>
           </div>
-          <Link to="/lancamentos/novo">
+          <Link to="/lancamentos/novo" className={canManage ? '' : 'hidden'}>
             <Button className="bg-[#FFC107] hover:bg-[#FFB300] text-black font-medium">
               <Plus className="w-4 h-4 mr-2" />
               Novo Lançamento
@@ -250,13 +257,14 @@ export function LancamentosPage() {
                     <TableCell className="text-right">
                       <button
                           onClick={() => setEditData(lanc)}
-                          className="p-2 text-[#FFD700] hover:bg-[#FFD700] hover:text-[#1a1a1a] rounded-lg transition-all"
+                          className={`p-2 text-[#FFD700] hover:bg-[#FFD700] hover:text-[#1a1a1a] rounded-lg transition-all ${canManage ? '' : 'hidden'}`}
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                       <Button
                         variant="ghost"
                         size="sm"
+                        className={canManage ? '' : 'hidden'}
                         onClick={() => setDeleteId(lanc.idLancamento)}
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />

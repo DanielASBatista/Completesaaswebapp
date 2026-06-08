@@ -2,6 +2,11 @@ import { apiRequest } from './api';
 import type { Empresa } from '../types';
 
 export const empresaService = {
+  async getMinha(): Promise<Empresa | null> {
+    const empresa = await apiRequest<Empresa>('/Empresa/Minha');
+    return empresa?.IdEmpresa || empresa?.idEmpresa ? empresa : null;
+  },
+
   async getAll(): Promise<Empresa[]> {
     return apiRequest<Empresa[]>('/Empresa/GetAll');
   },
@@ -11,7 +16,7 @@ export const empresaService = {
   },
 
   async create(empresa: Partial<Empresa>): Promise<Empresa> {
-    return apiRequest<Empresa>('/Empresa/New', {
+    return apiRequest<Empresa>('/Empresa/Minha', {
       method: 'POST',
       body: JSON.stringify(empresa),
     });

@@ -32,6 +32,8 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router';
 
 import { lancamentoService } from '../../services/lancamentoService';
+import { useAuth } from '../../context/AuthContext';
+import { isCompanyAdmin } from '../../utils/permissions';
 
 import type { Lancamento } from '../../types';
 
@@ -44,6 +46,8 @@ export function DashboardPage() {
     useState(true);
 
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = isCompanyAdmin(user);
 
   useEffect(() => {
 
@@ -63,11 +67,16 @@ export function DashboardPage() {
 
       const mes = now.getMonth() + 1;
 
-      const data =
-        await lancamentoService.getByMes(
-          ano,
-          mes
-        );
+      let data: Lancamento[];
+      if (isAdmin) {
+        data = await lancamentoService.getByMes(ano, mes);
+      } else {
+        const todos = await lancamentoService.getAllEmpresa();
+        data = todos.filter(l => {
+          const d = new Date(l.data);
+          return d.getFullYear() === ano && d.getMonth() + 1 === mes;
+        });
+      }
 
       setLancamentos(data);
 

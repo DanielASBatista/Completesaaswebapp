@@ -54,7 +54,13 @@ import { toast } from 'sonner';
 
 import { Link } from 'react-router';
 
+import { useAuth } from '../../context/AuthContext';
+import { isCompanyAdmin } from '../../utils/permissions';
+
 export function RecorrenciasPage() {
+
+  const { user } = useAuth();
+  const isAdmin = isCompanyAdmin(user);
 
   const [recorrencias, setRecorrencias] = useState<Recorrencia[]>([]);
 
@@ -79,7 +85,9 @@ export function RecorrenciasPage() {
 
       setIsLoading(true);
 
-      const data = await recorrenciaService.getAll();
+      const data = isAdmin
+        ? await recorrenciaService.getAll()
+        : await recorrenciaService.getAllEmpresa();
 
       setRecorrencias(data);
 

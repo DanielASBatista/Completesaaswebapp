@@ -6,6 +6,10 @@ export const projecaoService = {
     return apiRequest<Projecao[]>('/Projecoes/GetAll');
   },
 
+  async getAllEmpresa(): Promise<Projecao[]> {
+    return apiRequest<Projecao[]>('/Projecoes/Empresa');
+  },
+
   async getById(id: number): Promise<Projecao> {
     return apiRequest<Projecao>(`/Projecoes/${id}`);
   },

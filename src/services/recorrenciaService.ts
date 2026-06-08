@@ -6,6 +6,10 @@ export const recorrenciaService = {
     return apiRequest<Recorrencia[]>('/Recorrencia/GetAll');
   },
 
+  async getAllEmpresa(): Promise<Recorrencia[]> {
+    return apiRequest<Recorrencia[]>('/Recorrencia/Empresa');
+  },
+
   async getById(id: number): Promise<Recorrencia> {
     return apiRequest<Recorrencia>(`/Recorrencia/${id}`);
   },
